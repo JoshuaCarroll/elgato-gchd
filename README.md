@@ -28,8 +28,8 @@ Official Groupchat at Gitter: https://gitter.im/tolga9009/elgato-gchd
 This software needs Elgato Game Capture HD firmware files to work. Due to
 licensing issues, they're not part of this repository. You need to extract them
 yourself from the official Mac OS X drivers.
-**Note**: If you're a Mac OS X user, simply install the official drivers. You
-don't need to manually extract the firmware files.
+
+> **Mac users:** Simply install the official drivers. You don't need to manually extract the firmware files, so after you download and install the Elgato driver for OS X, skip down to the Install section.
 
 A brief instruction (for Linux only):
 
@@ -70,12 +70,22 @@ distribution, as package names might differ.
   * cmake (make)
   * make (make)
   * qt5 (optional) - for GUI support (not usable, work in progress)
+  
+  `sudo apt-get install libusb cmake make`
+  
+  > **Mac users:** Also install pkg-config:
+  > 
+  > `brew install pkg-config libusb cmake make`
 
 2. Compile the driver:
 
     1. Either clone or download the Git repository and extract it.
 
     2. Open up a terminal inside the project's root directory.
+    
+    > **Mac users:** Copy the libusb folder to the src folder:
+    >
+    > `cp /usr/local/include/libusb-1.0 ../src/`
 
     3. Create a new directory `build` in the project's root directory and
     navigate into it:
@@ -84,7 +94,7 @@ distribution, as package names might differ.
         mkdir build
         cd build
         ```
-
+    
     4. Run CMake from inside the `build` directory to setup the make
     environment and compile the driver:
 
@@ -92,6 +102,10 @@ distribution, as package names might differ.
         cmake ..
         make
         ```
+    
+    > **Mac users:** If you run the make command without any parameters, as shown above, you may get an error that `libusb.h` is not found. To work around this simply specify the library path when calling `make`:
+    >
+    > `make LIBRARY_PATH=/usr/local/lib`
 
     5. The compiled executable `gchd` is located in `build/src`. If you have
     Qt5 installed on your system, the GUI `qgchd` will be located at
@@ -102,6 +116,19 @@ distribution, as package names might differ.
 3. If the application works for you, you can optionally install it system-wide,
 running `make install` from within the `build` directory. This will install the
 executables to `/usr/bin`.
+
+> **Mac users:** If you are wanting to use your Elgato with OBS Studio, there are a couple of additional steps you'll need to follow before you start the application. This is because OBS Studio doesn't let you manually enter a filename for the Media Source, and the `/tmp` directory is hidden by default. So we'll need to create a directory to which we can browse in OBS and a placeholder file that we can use to set up OBS initially.
+>
+> 1. Create a file where your stream will be created:
+>
+>       `sudo mkdir /stream`
+>       `echo "ok" | sudo tee /stream/gchd.ts`
+>
+> 2. Open OBS, create a new Media Source, and set it to the file at `/stream/gchd.ts`.
+>
+> 3. In the `build/src` directory, start the application and specify the output file location:
+>
+>       `sudo ./gchd -o /stream/gchd.ts`
 
 
 ## Usage
